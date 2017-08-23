@@ -7,3 +7,5 @@ from clair_singularity import cli
 def runner():
     return CliRunner()
 
+def test_help(runner):
+    result = runner.invoke(cli, ['--help'])

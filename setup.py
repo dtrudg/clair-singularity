@@ -18,6 +18,8 @@ setup(
     zip_safe=False,
     platforms='any',
     install_requires=dependencies,
+    setup_requires=['pytest-runner'],
+    tests_require=['pytest', 'pytest-cov'],
     entry_points={
         'console_scripts': [
             'clair-singularity = clair_singularity.cli:main',

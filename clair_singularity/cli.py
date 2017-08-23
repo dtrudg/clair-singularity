@@ -53,5 +53,3 @@ def main(image, clair_uri, text_output, json_output, bind_ip, bind_port):
         format_report_text(report)
 
 
-if __name__ == '__main__':
-    main()
