@@ -27,9 +27,7 @@ def post_layer(API_URI, image_name, image_uri):
                       "Path": image_uri,
                       "Format": "Docker"
                       }
-        }
-
-                          )
+        })
 
         if r.status_code == requests.codes.created:
             sys.stderr.write("Image registered as layer with Clair\n")

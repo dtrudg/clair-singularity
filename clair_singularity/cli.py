@@ -1,19 +1,23 @@
 import click
+import json
+from os import path
 import shutil
 from multiprocessing import Process
 
-from .clair import *
+from .clair import check_clair, post_layer, get_report, format_report_text
 from .util import sha256
-from .image import *
+from .image import check_image, image_to_tgz, http_server
 
 
 @click.command()
-@click.option('--clair-uri', default="http://localhost:6060", help='Base URI for your Clair server')
+@click.option('--clair-uri', default="http://localhost:6060",
+              help='Base URI for your Clair server')
 @click.option('--text-output', is_flag=True, help='Report in Text (Default)')
 @click.option('--json-output', is_flag=True, help='Report in JSON')
 @click.option('--bind-ip', default="127.0.0.1",
               help='IP address that the HTTP server providing image to Clair should listen on')
-@click.option('--bind-port', default=8088, help='Port that the HTTP server providing image to Clair should listen on')
+@click.option('--bind-port', default=8088,
+              help='Port that the HTTP server providing image to Clair should listen on')
 @click.argument('image', required=True)
 def main(image, clair_uri, text_output, json_output, bind_ip, bind_port):
     API_URI = clair_uri + '/v1/'
@@ -51,5 +55,3 @@ def main(image, clair_uri, text_output, json_output, bind_ip, bind_port):
         click.echo(pretty_report)
     else:
         format_report_text(report)
-
-

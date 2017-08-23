@@ -45,6 +45,7 @@ def image_to_tgz(image):
 
     return (temp_dir, tar_gz_file)
 
+
 def http_server(dir, ip, port):
     """Use Python's Simple HTTP server to expose the image over HTTP for
     clair to grab it.
