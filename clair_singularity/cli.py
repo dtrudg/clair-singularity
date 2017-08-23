@@ -2,9 +2,9 @@ import click
 import shutil
 from multiprocessing import Process
 
-from clair import *
-from util import sha256
-from image import *
+from .clair import *
+from .util import sha256
+from .image import *
 
 
 @click.command()

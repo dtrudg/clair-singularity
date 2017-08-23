@@ -3,8 +3,8 @@ from os import path, chdir
 import tempfile
 import subprocess
 import sys
-import SimpleHTTPServer
-import SocketServer
+import http.server
+import socketserver
 
 def check_image(image):
     """Check if specified image file exists"""
@@ -50,6 +50,6 @@ def http_server(dir, ip, port):
     """
     sys.stderr.write("Serving Image to Clair from http://%s:%d\n" % (ip, port))
     chdir(dir)
-    Handler = SimpleHTTPServer.SimpleHTTPRequestHandler
-    httpd = SocketServer.TCPServer((ip, port), Handler)
+    Handler = http.server.SimpleHTTPRequestHandler
+    httpd = socketserver.TCPServer((ip, port), Handler)
     httpd.serve_forever()

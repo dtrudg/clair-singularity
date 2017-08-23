@@ -71,11 +71,11 @@ def format_report_text(report):
     for feature in features:
         if 'Vulnerabilities' in feature:
 
-            print "%s - %s" % (feature['Name'], feature['Version'])
-            print "-" * len(feature['Name'] + ' - ' + feature['Version'])
+            print("%s - %s" % (feature['Name'], feature['Version']))
+            print("-" * len(feature['Name'] + ' - ' + feature['Version']))
 
             for vuln in feature['Vulnerabilities']:
-                print vuln['Name']
-                print vuln['Link']
-                print vuln['Description']
-                print "\n"
+                print(vuln['Name'])
+                print(vuln['Link'])
+                print(vuln['Description'])
+                print("\n")
