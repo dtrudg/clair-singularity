@@ -1,122 +1,56 @@
 import click
-import requests
-from os import path
-import sys
-import json
-import hashlib
+import shutil
+from multiprocessing import Process
+
+from clair import *
+from util import sha256
+from image import *
+
 
 @click.command()
 @click.option('--clair-uri', default="http://localhost:6060", help='Base URI for your Clair server')
 @click.option('--text-output', is_flag=True, help='Report in Text (Default)')
 @click.option('--json-output', is_flag=True, help='Report in JSON')
+@click.option('--bind-ip', default="127.0.0.1",
+              help='IP address that the HTTP server providing image to Clair should listen on')
+@click.option('--bind-port', default=8088, help='Port that the HTTP server providing image to Clair should listen on')
 @click.argument('image', required=True)
-def main(image, clair_uri, text_output, json_output):
-
+def main(image, clair_uri, text_output, json_output, bind_ip, bind_port):
     API_URI = clair_uri + '/v1/'
 
+    # Check image exists, and export it to a gzipped tar in a temporary directory
     check_image(image)
-    tgz = image_to_tgz(image)
+    (tar_dir, tar_file) = image_to_tgz(image)
 
-    image_name = sha256(tgz)
+    # Image name for Clair will be the SHA256 of the .tar.gz
+    image_name = sha256(tar_file)
+    click.echo("Image has SHA256: %s" % image_name, err=True)
 
+    # Make sure we can talk to Clair OK
     check_clair(API_URI)
-    #post_layer(API_URI)
-    report = get_report(API_URI)
 
+    # Start an HTTP server to serve the .tar.gz from our temporary directory
+    # so that Clair can retrieve it
+    httpd = Process(target=http_server, args=(tar_dir, bind_ip, bind_port))
+    httpd.start()
+    image_uri = 'http://%s:%d/%s' % (bind_ip, bind_port, path.basename(tar_file))
+
+    # Register the iamge with Clair as a docker layer that has no parent
+    post_layer(API_URI, image_name, image_uri)
+
+    # Done with the .tar.gz so stop serving it and remove the temp dir
+    httpd.terminate()
+    shutil.rmtree(tar_dir)
+
+    # Retrieve the vulnerability report from Clair
+    report = get_report(API_URI, image_name)
+
+    # Spit out the report on STDOUT
     if json_output:
         pretty_report = json.dumps(report, separators=(',', ':'), sort_keys=True, indent=2)
         click.echo(pretty_report)
     else:
         format_report_text(report)
-
-
-def check_image(image):
-    """Check if specified image file exists"""
-
-    if not path.isfile(image):
-        click.secho('Error: Singularity image "%s" not found.' % image, fg='red', err=True)
-        sys.exit(66)  # E_NOINPUT
-    return True
-
-
-def check_clair(API_URI):
-    """Check Clair is accessible by call to namespaces end point"""
-
-    click.echo("Checking for Clair v1 API", err=True)
-    try:
-        r = requests.get(API_URI + 'namespaces')
-        namespace_count = len(r.json()['Namespaces'])
-        click.echo("Found Clair server with %d namespaces" % namespace_count, err=True)
-    except Exception as e:
-        click.echo("Error - couldn't access Clair v1 API at %s - %s" % (API_URI, e), err=True)
-    return True
-
-def post_layer(API_URI):
-    """Register an image .tar.gz with Clair as a parent-less layer"""
-
-    try:
-        r = requests.post(API_URI + 'layers',json={
-                              "Layer": {"Name": "5b741a2713d7600a7d5c546f651f51a3ce3f75748f9e84af13ce32661a3e651b",
-                                        "Path": "https://cloud.biohpc.swmed.edu/index.php/s/m2EpOxV4rDsRdSd/download",
-                                        "Format": "Docker"
-                                        }
-                          }
-
-                          )
-
-        if r.status_code == requests.codes.created:
-            click.echo("Image registered as layer with Clair", err=True)
-        else:
-            click.echo(r.status_code)
-            pretty_response = json.dumps(r.json(), separators=(',',':'),sort_keys=True,indent=2)
-
-            click.echo("Failed registering image with Clair\n %s" % pretty_response, err=True)
-
-    except Exception as e:
-        click.echo("Error - couldn't send image to Clair - %s" % (e), err=True)
-
-def get_report(API_URI):
-    """Retrieve and return the features & vulnerabilities report from Clair"""
-
-    try:
-        r = requests.get(API_URI + 'layers/' + "5b741a2713d7600a7d5c546f651f51a3ce3f75748f9e84af13ce32661a3e651b", params={'vulnerabilities': 'true'})
-
-        if r.status_code == requests.codes.ok:
-            return r.json()
-        else:
-            click.echo(r.status_code)
-            pretty_response = json.dumps(r.json(), separators=(',',':'),sort_keys=True,indent=2)
-
-            click.echo("Failed retrieving report from Clair\n %s" % pretty_response, err=True)
-
-    except Exception as e:
-        click.echo("Error - couldn't retrieve report from Clair - %s" % (e), err=True)
-
-
-def format_report_text(report):
-
-    features = report['Layer']['Features']
-
-    for feature in features:
-        if 'Vulnerabilities' in feature:
-
-            click.echo("%s - %s" % (feature['Name'], feature['Version']))
-            click.echo("-" * len(feature['Name'] + ' - ' + feature['Version']))
-
-            for vuln in feature['Vulnerabilities']:
-                click.echo(vuln['Name'])
-                click.echo(vuln['Link'])
-                click.echo(vuln['Description'])
-                click.echo("\n")
-
-
-def sha256(fname):
-    hash_sha256 = hashlib.sha256()
-    with open(fname, "rb") as f:
-        for chunk in iter(lambda: f.read(65536), b""):
-            hash_sha256.update(chunk)
-    return hash_sha256.hexdigest()
-
 
 
 if __name__ == '__main__':
