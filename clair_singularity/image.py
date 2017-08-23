@@ -1,10 +1,12 @@
-import click
-from os import path, chdir
-import tempfile
 import subprocess
 import sys
-import http.server
+import tempfile
+from os import path, chdir
+
+import click
 import socketserver
+from six.moves import SimpleHTTPServer
+
 
 def check_image(image):
     """Check if specified image file exists"""
@@ -50,6 +52,6 @@ def http_server(dir, ip, port):
     """
     sys.stderr.write("Serving Image to Clair from http://%s:%d\n" % (ip, port))
     chdir(dir)
-    Handler = http.server.SimpleHTTPRequestHandler
+    Handler = SimpleHTTPServer.SimpleHTTPRequestHandler
     httpd = socketserver.TCPServer((ip, port), Handler)
     httpd.serve_forever()

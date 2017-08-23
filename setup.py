@@ -3,7 +3,7 @@ Scan Singularity container images using CoreOS Clair.
 """
 from setuptools import find_packages, setup
 
-dependencies = ['click', 'singularity']
+dependencies = ['click', 'singularity', 'six']
 
 setup(
     name='clair_singularity',
