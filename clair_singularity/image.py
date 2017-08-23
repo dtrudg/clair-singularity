@@ -4,8 +4,7 @@ import tempfile
 from os import path, chdir
 
 import click
-import socketserver
-from six.moves import SimpleHTTPServer
+from six.moves import SimpleHTTPServer, socketserver
 
 
 def check_image(image):
