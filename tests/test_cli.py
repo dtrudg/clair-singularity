@@ -1,10 +1,13 @@
 import pytest
 import json
-import sys
+import socket
 from click.testing import CliRunner
 from clair_singularity.cli import cli
 
 from .test_image import testimage
+
+
+MY_IP = socket.gethostbyname(socket.gethostname())
 
 
 @pytest.fixture
@@ -19,7 +22,7 @@ def test_help(runner):
 
 def test_full_json(runner, testimage):
     result = runner.invoke(cli,
-                           ['--quiet', '--json-output', '--bind-ip', '127.0.0.1', '--bind-port', '8081', '--clair-uri',
+                           ['--quiet', '--json-output', '--bind-ip', MY_IP, '--bind-port', '8081', '--clair-uri',
                             'http://127.0.0.1:6060', testimage])
     output = json.loads(result.output)
 
@@ -36,7 +39,7 @@ def test_full_json(runner, testimage):
 
 
 def test_full_text(runner, testimage):
-    result = runner.invoke(cli, ['--quiet', '--bind-ip', '127.0.0.1', '--bind-port', '8082', '--clair-uri',
+    result = runner.invoke(cli, ['--quiet', '--bind-ip', MY_IP, '--bind-port', '8082', '--clair-uri',
                                  'http://127.0.0.1:6060', testimage])
     # Check we do have some CVEs we expect reported here
     assert 'bash - 4.3-14ubuntu1.1' in result.output
