@@ -41,6 +41,7 @@ def cli(image, clair_uri, text_output, json_output, bind_ip, bind_port, quiet):
     # Start an HTTP server to serve the .tar.gz from our temporary directory
     # so that Clair can retrieve it
     httpd = Process(target=http_server, args=(tar_dir, bind_ip, bind_port, quiet))
+    httpd.daemon = True
     httpd.start()
     # Allow up to 30 seconds for the httpd to start and be answering requests
     httpd_ready = wait_net_service(bind_ip, bind_port, 30)

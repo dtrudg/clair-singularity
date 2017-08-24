@@ -46,6 +46,7 @@ def test_http_server(testimage, tmpdir):
     """Test we can retrieve the test image from in-built http server"""
     httpd = multiprocessing.Process(target=http_server,
                                     args=(os.path.dirname(testimage), '127.0.0.1', 8088, False))
+    httpd.daemon = True
     httpd.start()
     # Allow up to 30 seconds for the httpd to start and be answering requests
     httpd_ready = wait_net_service('127.0.0.1', 8088, 30)
