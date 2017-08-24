@@ -47,7 +47,9 @@ def test_http_server(testimage, tmpdir):
     httpd = multiprocessing.Process(target=http_server,
                                     args=(os.path.dirname(testimage), '127.0.0.1', 8088, False))
     httpd.start()
-    time.sleep(2)
+    # Allow up to 30 seconds for the httpd to start and be answering requests
+    wait_net_service('127.0.0.1', 8088, 30)
+
     r = requests.get('http://127.0.0.1:8088/vsoch-singularity-hello-world-master.img',
                      proxies={'http://127.0.0.1': ''}, stream=True)
 
