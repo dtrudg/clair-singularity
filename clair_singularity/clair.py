@@ -2,7 +2,10 @@ from __future__ import print_function
 import requests
 import sys
 
-from .util import pretty_json, err_and_exit
+
+
+class ClairException(Exception):
+    pass
 
 
 def check_clair(API_URI, quiet):
@@ -16,7 +19,7 @@ def check_clair(API_URI, quiet):
         if not quiet:
             sys.stderr.write("Found Clair server with %d namespaces\n" % namespace_count)
     except Exception as e:
-        err_and_exit("Error - couldn't access Clair v1 API at %s\n%s\n" % (API_URI, e.message), 1)
+        raise ClairException("Error - couldn't access Clair v1 API at %s\n%s\n" % (API_URI, e.message))
     return True
 
 
@@ -35,10 +38,10 @@ def post_layer(API_URI, image_name, image_uri, quiet):
             if not quiet:
                 sys.stderr.write("Image registered as layer with Clair\n")
         else:
-            err_and_exit("Failed registering image with Clair\n %s\n" % pretty_json(r), 1)
+            raise ClairException("Failed registering image with Clair\n %s\n" % pretty_json(r))
 
     except Exception as e:
-        err_and_exit("Error - couldn't send image to Clair - %s\n" % (e), 1)
+        raise ClairException("Error - couldn't send image to Clair - %s\n" % (e))
 
 
 def get_report(API_URI, image_name):
@@ -50,10 +53,10 @@ def get_report(API_URI, image_name):
         if r.status_code == requests.codes.ok:
             return r.json()
         else:
-            err_and_exit("Failed retrieving report from Clair\n %s\n" % pretty_json(r), 1)
+            raise ClairException("Failed retrieving report from Clair\n %s\n" % pretty_json(r))
 
     except Exception as e:
-        err_and_exit("Error - couldn't retrieve report from Clair - %s\n" % (e), 1)
+        raise ClairException("Error - couldn't retrieve report from Clair - %s\n" % (e))
 
 
 def format_report_text(report):
