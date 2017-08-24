@@ -6,7 +6,7 @@ import time
 import pytest
 import requests
 
-from clair_singularity.image import image_to_tgz, check_image, http_server
+from clair_singularity.image import image_to_tgz, check_image, http_server, ImageException
 from clair_singularity.util import sha256, err_and_exit, wait_net_service
 
 
@@ -25,10 +25,9 @@ def test_check_image(testimage):
     # Valid image return True
     assert check_image(testimage)
     # Sys exit for invalid image
-    with pytest.raises(SystemExit) as pytest_wrapped_e:
+    with pytest.raises(ImageException) as pytest_wrapped_e:
         check_image('i_do_not_exist.img')
-    assert pytest_wrapped_e.type == SystemExit
-    assert pytest_wrapped_e.value.code == 66
+    assert pytest_wrapped_e.type == ImageException
 
 
 def test_image_to_tgz(testimage):
