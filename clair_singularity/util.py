@@ -14,7 +14,7 @@ def sha256(fname):
 
 def pretty_json(obj):
     """Format an object into json nicely"""
-    return json.dumps(obj.json(), separators=(',', ':'), sort_keys=True, indent=2)
+    return json.dumps(obj, separators=(',', ':'), sort_keys=True, indent=2)
 
 
 def err_and_exit(message, code=1):

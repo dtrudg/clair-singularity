@@ -38,7 +38,7 @@ def post_layer(API_URI, image_name, image_uri, quiet):
             if not quiet:
                 sys.stderr.write("Image registered as layer with Clair\n")
         else:
-            raise ClairException("Failed registering image with Clair\n %s\n" % pretty_json(r))
+            raise ClairException("Failed registering image with Clair\n %s\n" % pretty_json(r.json()))
 
     except Exception as e:
         raise ClairException("Error - couldn't send image to Clair - %s\n" % (e))
@@ -53,7 +53,7 @@ def get_report(API_URI, image_name):
         if r.status_code == requests.codes.ok:
             return r.json()
         else:
-            raise ClairException("Failed retrieving report from Clair\n %s\n" % pretty_json(r))
+            raise ClairException("Failed retrieving report from Clair\n %s\n" % pretty_json(r.json()))
 
     except Exception as e:
         raise ClairException("Error - couldn't retrieve report from Clair - %s\n" % (e))
