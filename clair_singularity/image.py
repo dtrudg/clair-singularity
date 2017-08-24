@@ -16,7 +16,7 @@ def check_image(image):
     return True
 
 
-def image_to_tgz(image):
+def image_to_tgz(image, quiet):
     """Export the singularity image to a tar.gz file"""
 
     temp_dir = tempfile.mkdtemp()
@@ -25,7 +25,8 @@ def image_to_tgz(image):
 
     cmd = ['singularity', 'export', '-f', tar_file, image]
 
-    sys.stderr.write("Exporting image to .tar\n")
+    if not quiet:
+        sys.stderr.write("Exporting image to .tar\n")
 
     try:
         subprocess.check_call(cmd)
@@ -35,7 +36,8 @@ def image_to_tgz(image):
 
     cmd = ['gzip', tar_file]
 
-    sys.stderr.write("Compressing to .tar.gz\n")
+    if not quiet:
+        sys.stderr.write("Compressing to .tar.gz\n")
 
     try:
         subprocess.check_call(cmd)
@@ -46,12 +48,20 @@ def image_to_tgz(image):
     return (temp_dir, tar_gz_file)
 
 
-def http_server(dir, ip, port):
+class QuietSimpleHTTPHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
+    def log_message(self, format, *args):
+        pass
+
+
+def http_server(dir, ip, port, quiet):
     """Use Python's Simple HTTP server to expose the image over HTTP for
     clair to grab it.
     """
     sys.stderr.write("Serving Image to Clair from http://%s:%d\n" % (ip, port))
     chdir(dir)
-    Handler = SimpleHTTPServer.SimpleHTTPRequestHandler
+    if quiet:
+        Handler = QuietSimpleHTTPHandler
+    else:
+        Handler = SimpleHTTPServer.SimpleHTTPRequestHandler
     httpd = socketserver.TCPServer((ip, port), Handler)
     httpd.serve_forever()

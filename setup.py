@@ -22,7 +22,7 @@ setup(
     tests_require=['pytest', 'pytest-cov', 'pytest-flake8'],
     entry_points={
         'console_scripts': [
-            'clair-singularity = clair_singularity.cli:main',
+            'clair-singularity = clair_singularity.cli:cli',
         ],
     },
     classifiers=[

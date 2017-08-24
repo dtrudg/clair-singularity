@@ -16,7 +16,7 @@ def testimage(tmpdir):
     cwd = os.getcwd()
     os.chdir(tmpdir.strpath)
     # This pulls a singularity hello world image
-    subprocess.call(['singularity', 'pull', 'shub://396'])
+    subprocess.check_output(['singularity', 'pull', 'shub://396'])
     os.chdir(cwd)
     return os.path.join(tmpdir.strpath, 'vsoch-singularity-hello-world-master.img')
 
@@ -32,7 +32,7 @@ def test_check_image(testimage):
 
 
 def test_image_to_tgz(testimage):
-    (temp_dir, tar_file) = image_to_tgz(testimage)
+    (temp_dir, tar_file) = image_to_tgz(testimage, False)
     # Should have created a temporary dir
     assert os.path.isdir(temp_dir)
     # The tar.gz should exist
@@ -45,7 +45,7 @@ def test_image_to_tgz(testimage):
 def test_http_server(testimage, tmpdir):
     """Test we can retrieve the test image from in-built http server"""
     httpd = multiprocessing.Process(target=http_server,
-                                    args=(os.path.dirname(testimage), '127.0.0.1', 8088))
+                                    args=(os.path.dirname(testimage), '127.0.0.1', 8088, False))
     httpd.start()
     time.sleep(2)
     r = requests.get('http://127.0.0.1:8088/vsoch-singularity-hello-world-master.img',
