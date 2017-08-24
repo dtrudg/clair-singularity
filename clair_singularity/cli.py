@@ -6,8 +6,8 @@ from multiprocessing import Process
 
 from . import VERSION
 from .clair import check_clair, post_layer, get_report, format_report_text, ClairException
-from .util import sha256, wait_net_service, err_and_exit
-from .image import check_image, image_to_tgz, http_server
+from .util import sha256, wait_net_service, err_and_exit, pretty_json
+from .image import check_image, image_to_tgz, http_server, ImageException
 
 
 @click.command()
@@ -27,8 +27,11 @@ def cli(image, clair_uri, text_output, json_output, bind_ip, bind_port, quiet):
     API_URI = clair_uri + '/v1/'
 
     # Check image exists, and export it to a gzipped tar in a temporary directory
-    check_image(image)
-    (tar_dir, tar_file) = image_to_tgz(image, quiet)
+    try:
+        check_image(image)
+        (tar_dir, tar_file) = image_to_tgz(image, quiet)
+    except ImageError as e:
+        err_and_exit(e.message, 1)
 
     # Image name for Clair will be the SHA256 of the .tar.gz
     image_name = sha256(tar_file)
@@ -50,7 +53,7 @@ def cli(image, clair_uri, text_output, json_output, bind_ip, bind_port, quiet):
     httpd_ready = wait_net_service(bind_ip, bind_port, 30)
     if not httpd_ready:
         httpd.terminate()
-        shutil.rmtree()
+        shutil.rmtree(tar_dir)
         err_and_exit("Error: HTTP server did not become ready\n", 1)
 
     image_uri = 'http://%s:%d/%s' % (bind_ip, bind_port, path.basename(tar_file))
@@ -60,7 +63,7 @@ def cli(image, clair_uri, text_output, json_output, bind_ip, bind_port, quiet):
         post_layer(API_URI, image_name, image_uri, quiet)
     except ClairException as e:
         httpd.terminate()
-        shutil.rmtree()
+        shutil.rmtree(tar_dir)
         err_and_exit(e.message, 1)
 
     # Done with the .tar.gz so stop serving it and remove the temp dir
@@ -72,7 +75,7 @@ def cli(image, clair_uri, text_output, json_output, bind_ip, bind_port, quiet):
 
     # Spit out the report on STDOUT
     if json_output:
-        pretty_report = json.dumps(report, separators=(',', ':'), sort_keys=True, indent=2)
+        pretty_report = pretty_json(report)
         click.echo(pretty_report)
     else:
         format_report_text(report)

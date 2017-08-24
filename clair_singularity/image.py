@@ -5,14 +5,15 @@ from os import path, chdir
 
 from six.moves import SimpleHTTPServer, socketserver
 
-from .util import err_and_exit
 
+class ImageException(Exception):
+    pass
 
 def check_image(image):
     """Check if specified image file exists"""
 
     if not path.isfile(image):
-        err_and_exit('Error: Singularity image "%s" not found.' % image, 66)  # E_NOINPUT
+        raise ImageException('Error: Singularity image "%s" not found.' % image)
     return True
 
 
@@ -31,7 +32,7 @@ def image_to_tgz(image, quiet):
     try:
         subprocess.check_call(cmd)
     except (subprocess.CalledProcessError, OSError) as e:
-        err_and_exit("Error calling Singularity export to create .tar file\n%s" % e.message, 1)
+        raise ImageException("Error calling Singularity export to create .tar file\n%s" % e.message)
 
     cmd = ['gzip', tar_file]
 
@@ -41,7 +42,7 @@ def image_to_tgz(image, quiet):
     try:
         subprocess.check_call(cmd)
     except subprocess.CalledProcessError as e:
-        err_and_exit("Error calling gzip export to compress .tar file\n%s" % e.message, 1)
+        raise ImageException("Error calling gzip export to compress .tar file\n%s" % e.message)
 
     return (temp_dir, tar_gz_file)
 

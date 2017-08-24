@@ -2,7 +2,7 @@ from __future__ import print_function
 import requests
 import sys
 
-
+from .util import pretty_json
 
 class ClairException(Exception):
     pass
