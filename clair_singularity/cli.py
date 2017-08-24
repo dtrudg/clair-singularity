@@ -5,7 +5,7 @@ import shutil
 from multiprocessing import Process
 
 from . import VERSION
-from .clair import check_clair, post_layer, get_report, format_report_text
+from .clair import check_clair, post_layer, get_report, format_report_text, ClairException
 from .util import sha256, wait_net_service, err_and_exit
 from .image import check_image, image_to_tgz, http_server
 
@@ -36,7 +36,10 @@ def cli(image, clair_uri, text_output, json_output, bind_ip, bind_port, quiet):
         click.echo("Image has SHA256: %s" % image_name, err=True)
 
     # Make sure we can talk to Clair OK
-    check_clair(API_URI, quiet)
+    try:
+        check_clair(API_URI, quiet)
+    except ClairException as e:
+        err_and_exit(e.message)
 
     # Start an HTTP server to serve the .tar.gz from our temporary directory
     # so that Clair can retrieve it
@@ -46,12 +49,18 @@ def cli(image, clair_uri, text_output, json_output, bind_ip, bind_port, quiet):
     httpd_ready = wait_net_service(bind_ip, bind_port, 30)
     if not httpd_ready:
         httpd.terminate()
-        err_and_exit("HTTP server did not become ready\n", 1)
+        shutil.rmtree()
+        err_and_exit("Error: HTTP server did not become ready\n", 1)
 
     image_uri = 'http://%s:%d/%s' % (bind_ip, bind_port, path.basename(tar_file))
 
     # Register the iamge with Clair as a docker layer that has no parent
-    post_layer(API_URI, image_name, image_uri, quiet)
+    try:
+        post_layer(API_URI, image_name, image_uri, quiet)
+    except ClairException as e:
+        httpd.terminate()
+        shutil.rmtree()
+        err_and_exit(e.message, 1)
 
     # Done with the .tar.gz so stop serving it and remove the temp dir
     httpd.terminate()
