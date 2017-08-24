@@ -2,7 +2,7 @@ from __future__ import print_function
 import requests
 import sys
 
-from util import pretty_json, err_and_exit
+from .util import pretty_json, err_and_exit
 
 
 def check_clair(API_URI, quiet):
