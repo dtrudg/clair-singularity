@@ -1,6 +1,8 @@
 sudo: required
 dist: trusty
 language: python
+services:
+  - docker
 python:
   - "2.7"
   - "3.4"
@@ -9,6 +11,9 @@ before_install:
   - sudo apt-key adv --recv-keys --keyserver hkp://pool.sks-keyservers.net:80 0xA5D32F012649A5A9
   - sudo apt-get -qq update
   - sudo apt-get install -y singularity-container
+  - docker run -d --name db arminc/clair-db:20187-08-21
+  - docker run -p 6060:6060 --link db:postgres -d --name clair arminc/clair-local-scan:v2.0.0
+  - docker ps
 install:
   - pip install --only-binary=numpy,scipy,scikit-learn,pandas numpy scipy scikit-learn pandas
   - pip install flake8 pytest pytest-cov pytest-flake8
