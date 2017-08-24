@@ -40,9 +40,6 @@ def test_image_to_tgz(testimage):
     # With the correct sha256
     # NO - the tar create in not reproducible (dir/file order?)
     # assert sha256(tar_file) == '337436d1b561fd4d174a43474baf742c9d436d4a58a343275322517bad044d75'
-    # Use simple size check for now
-    statinfo = os.stat(tar_file)
-    assert statinfo.st_size == 50843856
 
 
 def test_http_server(testimage, tmpdir):
