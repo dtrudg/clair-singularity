@@ -1,7 +1,6 @@
 import multiprocessing
 import os
 import subprocess
-import sys
 import time
 
 import pytest
@@ -22,7 +21,7 @@ def testimage(tmpdir):
     return os.path.join(tmpdir.strpath, 'vsoch-singularity-hello-world-master.img')
 
 
-def check_image(testimage):
+def test_check_image(testimage):
     # Valid image return True
     assert check_image(testimage)
     # Sys exit for invalid image
@@ -64,4 +63,5 @@ def test_http_server(testimage, tmpdir):
     httpd.terminate()
 
     assert r.status_code == requests.codes.ok
-    assert sha256(tmpfile) == '4dba283867ee8bd6178cb6f58778bf8b59e14833468fab58c4e52d9eeae7759f'
+    assert sha256(tmpfile) == \
+        '4dba283867ee8bd6178cb6f58778bf8b59e14833468fab58c4e52d9eeae7759f'

@@ -2,6 +2,7 @@
 
 <a href="https://codeclimate.com/github/dctrud/clair-singularity"><img src="https://codeclimate.com/github/dctrud/clair-singularity/badges/gpa.svg" /></a>
 <a href="https://travis-ci.org/dctrud/clair-singularity"><img src="https://travis-ci.org/dctrud/clair-singularity.svg?branch=master"></a>
+[![Coverage Status](https://coveralls.io/repos/github/dctrud/clair-singularity/badge.svg?branch=master)](https://coveralls.io/github/dctrud/clair-singularity?branch=master)
 
 __Scan [Singularity](http://singularity.lbl.gov/) container images for security vulnerabilities
 using [CoreOS Clair](https://github.com/coreos/clai).__
