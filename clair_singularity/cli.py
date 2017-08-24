@@ -4,6 +4,7 @@ from os import path
 import shutil
 from multiprocessing import Process
 
+from . import VERSION
 from .clair import check_clair, post_layer, get_report, format_report_text
 from .util import sha256
 from .image import check_image, image_to_tgz, http_server
@@ -18,8 +19,10 @@ from .image import check_image, image_to_tgz, http_server
 @click.option('--bind-port', default=8088,
               help='Port that the HTTP server providing image to Clair should listen on')
 @click.option('--quiet', is_flag=True, help='Suppress progress messages to STDERR')
+@click.version_option(version=VERSION)
 @click.argument('image', required=True)
 def cli(image, clair_uri, text_output, json_output, bind_ip, bind_port, quiet):
+
     API_URI = clair_uri + '/v1/'
 
     # Check image exists, and export it to a gzipped tar in a temporary directory
