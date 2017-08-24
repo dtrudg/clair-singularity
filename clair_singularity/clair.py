@@ -1,7 +1,8 @@
 from __future__ import print_function
 import requests
-import json
 import sys
+
+from util import pretty_json, err_and_exit
 
 
 def check_clair(API_URI, quiet):
@@ -15,8 +16,7 @@ def check_clair(API_URI, quiet):
         if not quiet:
             sys.stderr.write("Found Clair server with %d namespaces\n" % namespace_count)
     except Exception as e:
-        sys.stderr.write("Error - couldn't access Clair v1 API at %s\n%s\n" % (API_URI, e.message))
-        sys.exit(1)
+        err_and_exit("Error - couldn't access Clair v1 API at %s\n%s\n" % (API_URI, e.message), 1)
     return True
 
 
@@ -35,13 +35,10 @@ def post_layer(API_URI, image_name, image_uri, quiet):
             if not quiet:
                 sys.stderr.write("Image registered as layer with Clair\n")
         else:
-            pretty_response = json.dumps(r.json(), separators=(',', ':'), sort_keys=True, indent=2)
-            sys.stderr.write("Failed registering image with Clair\n %s\n" % pretty_response)
-            sys.exit(1)
+            err_and_exit("Failed registering image with Clair\n %s\n" % pretty_json(r), 1)
 
     except Exception as e:
-        sys.stderr.write("Error - couldn't send image to Clair - %s\n" % (e))
-        sys.exit(1)
+        err_and_exit("Error - couldn't send image to Clair - %s\n" % (e), 1)
 
 
 def get_report(API_URI, image_name):
@@ -53,13 +50,10 @@ def get_report(API_URI, image_name):
         if r.status_code == requests.codes.ok:
             return r.json()
         else:
-            pretty_response = json.dumps(r.json(), separators=(',', ':'), sort_keys=True, indent=2)
-            sys.stderr.write("Failed retrieving report from Clair\n %s\n" % pretty_response)
-            sys.exit(1)
+            err_and_exit("Failed retrieving report from Clair\n %s\n" % pretty_json(r), 1)
 
     except Exception as e:
-        sys.stderr.write("Error - couldn't retrieve report from Clair - %s\n" % (e))
-        sys.exit(1)
+        err_and_exit("Error - couldn't retrieve report from Clair - %s\n" % (e), 1)
 
 
 def format_report_text(report):

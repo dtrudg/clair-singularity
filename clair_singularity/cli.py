@@ -9,6 +9,7 @@ from .clair import check_clair, post_layer, get_report, format_report_text
 from .util import sha256
 from .image import check_image, image_to_tgz, http_server
 
+
 @click.command()
 @click.option('--clair-uri', default="http://localhost:6060",
               help='Base URI for your Clair server')
