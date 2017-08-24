@@ -7,7 +7,7 @@ import pytest
 import requests
 
 from clair_singularity.image import image_to_tgz, check_image, http_server
-from clair_singularity.util import sha256, err_and_exit
+from clair_singularity.util import sha256, err_and_exit, wait_net_service
 
 
 @pytest.fixture
