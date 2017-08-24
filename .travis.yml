@@ -7,10 +7,6 @@ python:
   - "2.7"
   - "3.4"
 before_install:
-  - wget -O- http://neuro.debian.net/lists/trusty.us-nh.full | sudo tee /etc/apt/sources.list.d/neurodebian.sources.list
-  - sudo apt-key adv --recv-keys --keyserver hkp://pool.sks-keyservers.net:80 0xA5D32F012649A5A9
-  - sudo apt-get -qq update
-  - sudo apt-get install -y singularity-container
   - docker pull arminc/clair-db:2017-08-21
   - docker run -d --name db arminc/clair-db:2017-08-21
   - docker pull arminc/clair-local-scan:v2.0.0
@@ -20,7 +16,8 @@ install:
   - pip install flake8 pytest pytest-cov pytest-flake8 python-coveralls
   - python setup.py install
 script:
-  - pytest tests/ --cov clair_singularity --cov-report term-missing
+  - docker build -t clair_singularity .
+  - docker run -v $TRAVIS_BUILD_DIR:/app --privileged --name clair-singularity --link clair:clair clair_singularity pytest tests/ --cov clair-singularity --cov-report term-missing
   - coveralls
 
 
