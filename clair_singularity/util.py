@@ -48,7 +48,6 @@ def wait_net_service(server, port, timeout=None):
                  throw unhandled network exception
     """
     import socket
-    import errno
 
     s = socket.socket()
     if timeout:
@@ -67,16 +66,9 @@ def wait_net_service(server, port, timeout=None):
 
             s.connect((server, port))
 
-        except socket.timeout, err:
-            # this exception occurs only if timeout is set
-            if timeout:
-                return False
+        except (socket.timeout, socket.error):
+            pass
 
-        except socket.error, err:
-            # catch timeout exception from underlying network library
-            # this one is different from socket.timeout
-            if type(err.args) != tuple or err[0] != errno.ETIMEDOUT:
-                raise
         else:
             s.close()
             return True

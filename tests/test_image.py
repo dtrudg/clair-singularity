@@ -7,7 +7,7 @@ import pytest
 import requests
 
 from clair_singularity.image import image_to_tgz, check_image, http_server
-from clair_singularity.util import sha256
+from clair_singularity.util import sha256, err_and_exit
 
 
 @pytest.fixture
@@ -48,7 +48,11 @@ def test_http_server(testimage, tmpdir):
                                     args=(os.path.dirname(testimage), '127.0.0.1', 8088, False))
     httpd.start()
     # Allow up to 30 seconds for the httpd to start and be answering requests
-    wait_net_service('127.0.0.1', 8088, 30)
+    httpd_ready = wait_net_service('127.0.0.1', 8088, 30)
+    if not httpd_ready:
+        httpd.terminate()
+        err_and_exit("HTTP server did not become ready", 1)
+
 
     r = requests.get('http://127.0.0.1:8088/vsoch-singularity-hello-world-master.img',
                      proxies={'http://127.0.0.1': ''}, stream=True)

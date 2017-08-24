@@ -6,7 +6,7 @@ from multiprocessing import Process
 
 from . import VERSION
 from .clair import check_clair, post_layer, get_report, format_report_text
-from .util import sha256, wait_net_service
+from .util import sha256, wait_net_service, err_and_exit
 from .image import check_image, image_to_tgz, http_server
 
 
@@ -43,7 +43,10 @@ def cli(image, clair_uri, text_output, json_output, bind_ip, bind_port, quiet):
     httpd = Process(target=http_server, args=(tar_dir, bind_ip, bind_port, quiet))
     httpd.start()
     # Allow up to 30 seconds for the httpd to start and be answering requests
-    wait_net_service(bind_ip, bind_port, 30)
+    httpd_ready = wait_net_service(bind_ip, bind_port, 30)
+    if not httpd_ready:
+        httpd.terminate()
+        err_and_exit("HTTP server did not become ready\n", 1)
 
     image_uri = 'http://%s:%d/%s' % (bind_ip, bind_port, path.basename(tar_file))
 
