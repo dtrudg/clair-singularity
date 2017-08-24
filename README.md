@@ -106,8 +106,7 @@ report returned by Clair use the `--jsoon-output` option.
 
 ## Development / Testing
 
-Tests are run using `pytest` and expect there to be:
+Tests are run using using pytest inside a docker container, via a script that will bring up a clair instance and run
+clair-singularity within a correctly linked container:
 
-* A clair server listening at http://127.0.0.1:6060 (per docker instructions above).
-* Internet access to pull a test image from Singularity Hub
-* Singlurity installed, with the `singularity` executable on the `PATH`.
+    ./docker_local_tests.sh
