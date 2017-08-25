@@ -1,5 +1,5 @@
 before_script:
-    python setup.py develop
+  - python setup.py develop
 
 test:
   script:
