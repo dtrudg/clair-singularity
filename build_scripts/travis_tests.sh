@@ -1,12 +1,12 @@
 #!/bin/bash
 
-echo "Running tests that don't need Clair"
-pytest tests/ -v -m "not needs_clair" --cov clair_singularity --cov-report term-missing
-
 echo "Running setup.py install"
 python setup.py install
 
-if [[ $PYTHON_VERSION == "3.5"* ]]; then
+echo "Running tests that don't need Clair"
+pytest tests/ -v -m "not needs_clair" --cov clair_singularity --cov-report term-missing
+
+if [[ $TRAVIS_PYTHON_VERSION == "3.5"* ]]; then
     echo "Python 3.5 - running docker tests with Clair"
     docker pull arminc/clair-db:2017-08-21
     docker run -d --name db arminc/clair-db:2017-08-21

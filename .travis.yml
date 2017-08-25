@@ -12,9 +12,3 @@ install:
   - pip install flake8 pytest pytest-cov pytest-flake8 python-coveralls
 script:
   - build_scripts/travis_tests.sh
-after_success:
-  - coveralls -b $TRAVIS_BUILD_DIR
-
-
-
-
