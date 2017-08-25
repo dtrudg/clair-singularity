@@ -17,6 +17,10 @@ if [[ $TRAVIS_PYTHON_VERSION == "3.5"* ]]; then
     docker run -p 6060:6060 --link db:postgres -d --name clair arminc/clair-local-scan:v2.0.0
     docker ps
     docker build -t clair_singularity .
+
+    # Clear out any old .pyc from the local tests
+    find . -name *.pyc -delete
+
     docker run -v $TRAVIS_BUILD_DIR:/app --privileged --name clair-singularity --link clair:clair clair_singularity pytest tests/ -v --cov clair_singularity --cov-report term-missing
     if [ $? -eq 0 ]; then
         coveralls -b $TRAVIS_BUILD_DIR
