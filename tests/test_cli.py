@@ -20,6 +20,7 @@ def test_help(runner):
     assert 'Usage:' in result.output
 
 
+@pytest.mark.needs_clair
 def test_full_json(runner, testimage):
     result = runner.invoke(cli,
                            ['--quiet', '--json-output', '--bind-ip', MY_IP, '--bind-port', '8081', '--clair-uri',
@@ -38,6 +39,7 @@ def test_full_json(runner, testimage):
     assert features_with_vuln == 14
 
 
+@pytest.mark.needs_clair
 def test_full_text(runner, testimage):
     result = runner.invoke(cli, ['--quiet', '--bind-ip', MY_IP, '--bind-port', '8082', '--clair-uri',
                                  'http://clair:6060', testimage])

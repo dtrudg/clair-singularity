@@ -6,19 +6,15 @@ services:
 python:
   - "2.7"
   - "3.4"
-before_install:
-  - docker pull arminc/clair-db:2017-08-21
-  - docker run -d --name db arminc/clair-db:2017-08-21
-  - docker pull arminc/clair-local-scan:v2.0.0
-  - docker run -p 6060:6060 --link db:postgres -d --name clair arminc/clair-local-scan:v2.0.0
-  - docker ps
+  - "3.5"
+  - "3.6"
 install:
   - pip install flake8 pytest pytest-cov pytest-flake8 python-coveralls
-  - python setup.py install
 script:
-  - docker build -t clair_singularity .
-  - docker run -v $TRAVIS_BUILD_DIR:/app --privileged --name clair-singularity --link clair:clair clair_singularity pytest tests/ --cov clair_singularity --cov-report term-missing
-  - coveralls
+  - build_scripts/travis_tests.sh
+after_success:
+  - coveralls -b $TRAVIS_BUILD_DIR
+
 
 
 
