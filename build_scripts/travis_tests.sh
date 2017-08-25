@@ -21,11 +21,6 @@ if [[ $TRAVIS_PYTHON_VERSION == "3.5"* ]]; then
     # Clear out any old .pyc from the local tests
     find . -name *.pyc -delete
 
-    docker run -v $TRAVIS_BUILD_DIR:/app --privileged --name clair-singularity --link clair:clair clair_singularity pytest tests/ -v --cov clair_singularity --cov-report term-missing
-    if [ $? -eq 0 ]; then
-        # TODO - fix this bodge properly by running coveralls inside the container (think needs some ENV passed in)
-        sudo ln -s $TRAVIS_BUILD_DIR /app
-        cd /app
-        coveralls
-    fi
+    docker run -v $TRAVIS_BUILD_DIR:/app --privileged --link clair:clair clair_singularity pytest tests/ -v --cov clair_singularity --cov-report term-missing
+    docker run -e TRAVIS=$TRAVIS -e TRAVIS_JOB_ID=$TRAVIS_JOB_ID -v $TRAVIS_BUILD_DIR:/app --privileged clair_singularity coveralls
 fi
