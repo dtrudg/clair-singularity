@@ -25,6 +25,7 @@ if [[ $TRAVIS_PYTHON_VERSION == "3.5"* ]]; then
     if [ $? -eq 0 ]; then
         # TODO - fix this bodge properly by running coveralls inside the container (think needs some ENV passed in)
         sudo ln -s $TRAVIS_BUILD_DIR /app
-        coveralls -b $TRAVIS_BUILD_DIR
+        cd /app
+        coveralls
     fi
 fi
