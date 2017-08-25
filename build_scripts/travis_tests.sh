@@ -23,6 +23,8 @@ if [[ $TRAVIS_PYTHON_VERSION == "3.5"* ]]; then
 
     docker run -v $TRAVIS_BUILD_DIR:/app --privileged --name clair-singularity --link clair:clair clair_singularity pytest tests/ -v --cov clair_singularity --cov-report term-missing
     if [ $? -eq 0 ]; then
+        # TODO - fix this bodge properly by running coveralls inside the container (think needs some ENV passed in)
+        sudo ln -s $TRAVIS_BUILD_DIR /app
         coveralls -b $TRAVIS_BUILD_DIR
     fi
 fi
