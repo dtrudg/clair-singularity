@@ -1,4 +1,8 @@
 #!/bin/sh
+
+set -e
+set -u
+
 docker pull arminc/clair-db:2017-08-21
 docker run -d --name db arminc/clair-db:2017-08-21
 

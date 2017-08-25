@@ -1,5 +1,8 @@
 #!/bin/bash
 
+set -e
+set -u
+
 echo "Running setup.py install"
 python setup.py install
 

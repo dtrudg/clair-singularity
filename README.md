@@ -106,7 +106,27 @@ report returned by Clair use the `--jsoon-output` option.
 
 ## Development / Testing
 
-Tests are run using using pytest inside a docker container, via a script that will bring up a clair instance and run
-clair-singularity within a correctly linked container:
+Tests can are run in 3 different ways:
 
-    ./docker_local_tests.sh
+__Local - no access to Clair__
+
+Runs all tests that don't depend on access to a Clair server, using the local Python.
+
+    $ build_scripts/noclair_local_tests.sh
+
+__Local - dockerized with Clair__
+
+Starts a Clair service with local docker, builds clair-singularity into a docker container, with Python 3.5, and
+runs tests in this docker container.
+
+    $ build_scripts/docker_local_tests.sh
+
+__TravisCI__
+
+Travis CI automated testing will test non-Clair dependent code using Python 2.7, 3.4, 3.5, 3.6.
+
+Clair dependent code will be tested only in the 3.5 environment, by building the docker container, starting a Clair
+service, and running tests in the docker container.
+
+
+
