@@ -1,0 +1,7 @@
+before_script:
+    python setup.py develop
+
+test:
+  script:
+  - build_scripts/noclair_local_tests.sh
+
