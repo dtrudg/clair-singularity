@@ -9,7 +9,7 @@ RUN apt-get -qq update
 RUN apt-get install -y singularity-container
 
 # Testing packages
-RUN pip install flake8 pytest pytest-cov pytest-flake8
+RUN pip install flake8 pytest pytest-cov pytest-flake8 python-coveralls
 
 RUN mkdir /app
 COPY . /app
