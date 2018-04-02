@@ -24,7 +24,7 @@ def image_to_tgz(image, quiet):
     tar_file = path.join(temp_dir, path.basename(image) + '.tar')
     tar_gz_file = tar_file + '.gz'
 
-    cmd = ['singularity', 'export', '-f', tar_file, image]
+    cmd = ['singularity', 'image.export', '-f', tar_file, image]
 
     if not quiet:
         sys.stderr.write("Exporting image to .tar\n")
