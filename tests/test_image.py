@@ -16,9 +16,9 @@ def testimage(tmpdir):
     cwd = os.getcwd()
     os.chdir(tmpdir.strpath)
     # This pulls a singularity hello world image
-    subprocess.check_output(['singularity', 'pull', 'shub://396'])
+    subprocess.check_output(['singularity', 'pull', 'shub://singularityhub/hello-world:latest'])
     os.chdir(cwd)
-    return os.path.join(tmpdir.strpath, 'vsoch-singularity-hello-world-master.img')
+    return os.path.join(tmpdir.strpath, 'singularityhub-hello-world-master-latest.simg')
 
 
 def test_check_image(testimage):
@@ -54,10 +54,9 @@ def test_http_server(testimage, tmpdir):
         err_and_exit("HTTP server did not become ready", 1)
 
 
-    r = requests.get('http://127.0.0.1:8088/vsoch-singularity-hello-world-master.img',
-                     proxies={'http://127.0.0.1': ''}, stream=True)
+    r = requests.get('http://127.0.0.1:8088/singularityhub-hello-world-master-latest.simg', stream=True)
 
-    tmpfile = os.path.join(tmpdir.strpath, 'downloaded.img')
+    tmpfile = os.path.join(tmpdir.strpath, 'downloaded.simg')
     # Check the file is good
     with open(tmpfile, 'wb') as fd:
         for block in r.iter_content(1024):
@@ -67,4 +66,4 @@ def test_http_server(testimage, tmpdir):
 
     assert r.status_code == requests.codes.ok
     assert sha256(tmpfile) == \
-        '4dba283867ee8bd6178cb6f58778bf8b59e14833468fab58c4e52d9eeae7759f'
+        '604551697a76f8855be73b4dbf1fd49097f1087de7d5826bc0c6f2bfa81ce4fe'

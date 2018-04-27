@@ -40,7 +40,7 @@ Clair instance, or that only a trusted Clair instance can retrieve images from t
 To use clair-singularity you will need a _Linux_ host with:
 
   * Python 2.7 or greater installed
-  * Singularity 2.4+ installed (tested with 2.4.5) and the singularity executable in your `PATH`
+  * Singularity 2.4+ installed (tested with 2.4.6) and the singularity executable in your `PATH`
   * A Clair instance running somewhere, that is able to access the machine you will run 
   clair-singularity on. It's easiest to accomplish this using docker to run a local Clair instance as below.
   
@@ -58,11 +58,11 @@ https://github.com/arminc/clair-local-scan
 To startup a Clair instance locally using these instances:
 
 ```bash
-docker run -d --name db arminc/clair-db:20187-08-21
-docker run -p 6060:6060 --link db:postgres -d --name clair arminc/clair-local-scan:v2.0.0
+docker run -d --name db arminc/clair-db:2018-04-01
+docker run -p 6060:6060 --link db:postgres -d --name clair arminc/clair-local-scan:v2.0.1
 ```
 
-*Replace the clair-db:2017-08-21 image tag with a later date for newer vulnerabilities*
+*Replace the clair-db:2018-04-01 image tag with a later date for newer vulnerabilities*
 
 
 ## Installation

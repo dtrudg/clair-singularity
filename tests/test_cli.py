@@ -27,16 +27,16 @@ def test_full_json(runner, testimage):
                             'http://clair:6060', testimage])
     output = json.loads(result.output)
 
-    # Using the shub://396 image and the 2017-08-21 clair db...
+    # Using the shub hello-world image and the 2017-08-21 clair db...
     # There are 62 features in the container scan, and 14 have vulnerabilities
     assert 'Layer' in output
     assert 'Features' in output['Layer']
-    assert len(output['Layer']['Features']) == 62
+    assert len(output['Layer']['Features']) == 126
     features_with_vuln = 0
     for feature in output['Layer']['Features']:
         if 'Vulnerabilities' in feature:
             features_with_vuln = features_with_vuln + 1
-    assert features_with_vuln == 14
+    assert features_with_vuln == 30
 
 
 @pytest.mark.needs_clair
@@ -44,5 +44,5 @@ def test_full_text(runner, testimage):
     result = runner.invoke(cli, ['--quiet', '--bind-ip', MY_IP, '--bind-port', '8082', '--clair-uri',
                                  'http://clair:6060', testimage])
     # Check we do have some CVEs we expect reported here
-    assert 'bash - 4.3-14ubuntu1.1' in result.output
-    assert 'CVE-2016-9401' in result.output
+    assert 'ssl' in result.output
+    assert 'CVE' in result.output
