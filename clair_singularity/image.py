@@ -20,21 +20,21 @@ def check_image(image):
 def image_to_tgz(image, quiet):
     """Export the singularity image to a tar.gz file"""
 
-    temp_dir = tempfile.mkdtemp()
-    tar_file = path.join(temp_dir, path.basename(image) + '.tar')
-    tar_gz_file = tar_file + '.gz'
+    sandbox_dir = tempfile.mkdtemp()
+    tar_dir  = tempfile.mkdtemp()
+    tar_gz_file = path.join(tar_dir, path.basename(image) + '.tar.gz')
 
-    cmd = ['singularity', 'image.export', '-f', tar_file, image]
+    cmd = ['singularity', 'build', '-F', '--sandbox', sandbox_dir, image]
 
     if not quiet:
-        sys.stderr.write("Exporting image to .tar\n")
+        sys.stderr.write("Exporting image to sandbox.\n")
 
     try:
         subprocess.check_call(cmd)
     except (subprocess.CalledProcessError, OSError) as e:
-        raise ImageException("Error calling Singularity export to create .tar file\n%s" % e.message)
+        raise ImageException("Error calling Singularity export to create sandbox\n%s" % e)
 
-    cmd = ['gzip', tar_file]
+    cmd = ['tar', '-zcf', tar_gz_file, sandbox_dir]
 
     if not quiet:
         sys.stderr.write("Compressing to .tar.gz\n")
@@ -42,9 +42,9 @@ def image_to_tgz(image, quiet):
     try:
         subprocess.check_call(cmd)
     except subprocess.CalledProcessError as e:
-        raise ImageException("Error calling gzip export to compress .tar file\n%s" % e.message)
+        raise ImageException("Error calling gzip export to compress .tar file\n%s" % e)
 
-    return (temp_dir, tar_gz_file)
+    return (tar_dir, tar_gz_file)
 
 
 class QuietSimpleHTTPHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
