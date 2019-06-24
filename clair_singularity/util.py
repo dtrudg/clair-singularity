@@ -17,9 +17,9 @@ def pretty_json(obj):
     return json.dumps(obj, separators=(',', ':'), sort_keys=True, indent=2)
 
 
-def err_and_exit(message, code=1):
-    """Write error to STDERR and exit with supplied code"""
-    sys.stderr.write(message)
+def err_and_exit(e, code=1):
+    """Write exception to STDERR and exit with supplied code"""
+    sys.stderr.write(str(e))
     sys.exit(code)
 
 

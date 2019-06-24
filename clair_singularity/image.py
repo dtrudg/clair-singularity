@@ -34,7 +34,7 @@ def image_to_tgz(image, quiet):
     except (subprocess.CalledProcessError, OSError) as e:
         raise ImageException("Error calling Singularity export to create sandbox\n%s" % e)
 
-    cmd = ['tar', '-zcf', tar_gz_file, sandbox_dir]
+    cmd = ['tar', '-C', sandbox_dir, '-zcf', tar_gz_file, '.']
 
     if not quiet:
         sys.stderr.write("Compressing to .tar.gz\n")

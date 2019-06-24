@@ -1,6 +1,8 @@
 from __future__ import print_function
+import pprint
 import requests
 import sys
+import time
 
 from .util import pretty_json
 
@@ -19,7 +21,7 @@ def check_clair(API_URI, quiet):
         if not quiet:
             sys.stderr.write("Found Clair server with %d namespaces\n" % namespace_count)
     except Exception as e:
-        raise ClairException("Error - couldn't access Clair v1 API at %s\n%s\n" % (API_URI, e.message))
+        raise ClairException("Error - couldn't access Clair v1 API at %s\n%s\n" % (API_URI, e))
     return True
 
 
@@ -27,12 +29,19 @@ def post_layer(API_URI, image_name, image_uri, quiet):
     """Register an image .tar.gz with Clair as a parent-less layer"""
 
     try:
-        r = requests.post(API_URI + 'layers', json={
+
+        payload = {
             "Layer": {"Name": image_name,
                       "Path": image_uri,
-                      "Format": "Docker"
-                      }
-        })
+                      "Format": "Docker"}
+        }
+
+        if not quiet:
+            sys.stderr.write(pprint.pformat(payload))
+
+        time.sleep(1)
+ 
+        r = requests.post(API_URI + 'layers', json=payload)
 
         if r.status_code == requests.codes.created:
             if not quiet:
