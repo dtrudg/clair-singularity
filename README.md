@@ -17,7 +17,6 @@ singularity container image is similar to a single layer docker image.
 This tool:
 
    * Exports a singularity image to a temporary .tar.gz file (this will be under $TMPDIR)
-   * Computes the SHA256 hash as a unique name to pass to Clair
    * Serves the .tar.gz file via an in-built http server, so the Clair service can retrieve it
    * Calls the Clair API to ingest the .tar.gz file as a layer for analysis
    * Calls the Clair API to retireve a vulnerability report for this layer
@@ -28,7 +27,7 @@ Based on experiments detailed [in this Gist](https://gist.github.com/dctrud/4797
 
 __IMPORTANT NOTES__
 
-This tool is currently a quick hack, not heavily tested. Use at your own risk. 
+This tool should be considered proof of concept, not heavily tested. Use at your own risk. 
 
 There is no support yet for SSL client certificates to verify that we are sending API requests to a trusted
 Clair instance, or that only a trusted Clair instance can retrieve images from the inbuilt http server.
@@ -40,7 +39,7 @@ Clair instance, or that only a trusted Clair instance can retrieve images from t
 To use clair-singularity you will need a _Linux_ host with:
 
   * Python 2.7 or greater installed
-  * Singularity 2.4+ installed (tested with 2.4.6) and the singularity executable in your `PATH`
+  * Singularity 3+ installed (tested with 3.2.1) and the singularity executable in your `PATH`
   * A Clair instance running somewhere, that is able to access the machine you will run 
   clair-singularity on. It's easiest to accomplish this using docker to run a local Clair instance as below.
   
@@ -58,11 +57,11 @@ https://github.com/arminc/clair-local-scan
 To startup a Clair instance locally using these instances:
 
 ```bash
-docker run -d --name db arminc/clair-db:2018-04-01
-docker run -p 6060:6060 --link db:postgres -d --name clair arminc/clair-local-scan:v2.0.1
+docker run -d --name db arminc/clair-db:2019-06-24
+docker run -p 6060:6060 --link db:postgres -d --name clair arminc/clair-local-scan:v2.0.8_0ed98e9ead65a51ba53f7cc53fa5e80c92169207
 ```
 
-*Replace the clair-db:2018-04-01 image tag with a later date for newer vulnerabilities*
+*Replace the clair-db:2019-06-24 image tag with a later date for newer vulnerabilities*
 
 
 ## Installation
@@ -78,21 +77,25 @@ python setup.py install
 
 __Clair on same machine__
 
-To scan a singularity image, using a clair instance running at the localhost, on port 6060 (as above):
 
-    clair-singularity myimage.img
+If you are running `clair-singularity` locally (outside of docker), and clair
+within docker, you need to tell `clair-singularity` to serve images on the main
+IP of your host, so that dockerized clair can access them.
+
+To scan a singularity image, using a clair instance running under local docker, on
+port 6060:
+
+    clair-singularity --bind-ip 192.168.1.201 myimage.img
     
-To scan a singularity image, using a clair instance at a different URI on the localhost (e.g. behind
-a reverse proxy):
-
-    clair-singularity --clair-uri http://127.0.0.1:80/clair myimage.img
-
+/Replace `192.168.1.201` with a non-localhost IP of your machine, accessible to
+docker containers./
+    
 __Clair on a different machine__
 
-By default, clair-singularity uses a python simple http server binding on localhost port 8088 to make
-the .tar.gz available to the Clair server for scanning. If you are running clair-singularity on a
-different machine than clair you must instruct the http server to listen to a public interface, that
-the Clair server is able to talk to, e.g:
+If clair is running on a different machine, you must use the `--clair-uri`
+option to specify the base URI to the clair instance, and the `--bind-ip` and/or
+`--bind-port` options to specify a public IP and port on this machine, that
+clair can access to retrieve images from `clair-singularity`.
 
     clair-singularity --clair-uri http://10.0.1.202:6060 --bind-ip=10.0.1.201 --bind-port=8088 myimage.img
 
@@ -102,7 +105,6 @@ By default, clair-singularity gives a simplified text report on STDOUT. To obtai
 report returned by Clair use the `--jsoon-output` option.
 
     clair-singularity --json-output myimage.img
-
 
 ## Development / Testing
 
@@ -123,10 +125,7 @@ runs tests in this docker container.
 
 __TravisCI__
 
-Travis CI automated testing will test non-Clair dependent code using Python 2.7, 3.4, 3.5, 3.6.
+Travis CI automated testing will test non-Clair dependent code using Python 2.7, 3.6, 3.7
 
-Clair dependent code will be tested only in the 3.5 environment, by building the docker container, starting a Clair
+Clair dependent code will be tested only in the 3.6 environment, by building the docker container, starting a Clair
 service, and running tests in the docker container.
-
-
-

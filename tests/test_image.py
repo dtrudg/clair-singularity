@@ -15,10 +15,10 @@ def testimage(tmpdir):
     """Fetch a test singularity image"""
     cwd = os.getcwd()
     os.chdir(tmpdir.strpath)
-    # This pulls a singularity hello world image
-    subprocess.check_output(['singularity', 'pull', 'shub://singularityhub/hello-world:latest'])
+    # This pulls a singularity lolcow image
+    subprocess.check_output(['singularity', 'pull', '-U', 'library://sylabsed/examples/lolcow:sha256.2c82ea3923489b14b7c6b7cc593f384c44e107a0a0579d9148fa1331d4508736'])
     os.chdir(cwd)
-    return os.path.join(tmpdir.strpath, 'singularityhub-hello-world-master-latest.simg')
+    return os.path.join(tmpdir.strpath, 'lolcow_sha256.2c82ea3923489b14b7c6b7cc593f384c44e107a0a0579d9148fa1331d4508736.sif')
 
 
 def test_check_image(testimage):
@@ -42,7 +42,7 @@ def test_image_to_tgz(testimage):
 
 
 def test_http_server(testimage, tmpdir):
-    """Test we can retrieve the test image from in-built http server"""
+    """Test we can retrieve a test file from in-built http server faithfully"""
     httpd = multiprocessing.Process(target=http_server,
                                     args=(os.path.dirname(testimage), '127.0.0.1', 8088, False))
     httpd.daemon = True
@@ -53,10 +53,9 @@ def test_http_server(testimage, tmpdir):
         httpd.terminate()
         err_and_exit("HTTP server did not become ready", 1)
 
+    r = requests.get('http://127.0.0.1:8088/lolcow_sha256.2c82ea3923489b14b7c6b7cc593f384c44e107a0a0579d9148fa1331d4508736.sif', stream=True)
 
-    r = requests.get('http://127.0.0.1:8088/singularityhub-hello-world-master-latest.simg', stream=True)
-
-    tmpfile = os.path.join(tmpdir.strpath, 'downloaded.simg')
+    tmpfile = os.path.join(tmpdir.strpath, 'downloaded.sif')
     # Check the file is good
     with open(tmpfile, 'wb') as fd:
         for block in r.iter_content(1024):
@@ -65,5 +64,4 @@ def test_http_server(testimage, tmpdir):
     httpd.terminate()
 
     assert r.status_code == requests.codes.ok
-    assert sha256(tmpfile) == \
-        '604551697a76f8855be73b4dbf1fd49097f1087de7d5826bc0c6f2bfa81ce4fe'
+    assert sha256(tmpfile) == sha256(testimage)

@@ -27,16 +27,16 @@ def test_full_json(runner, testimage):
                             'http://clair:6060', testimage])
     output = json.loads(result.output)
 
-    # Using the shub hello-world image and the 2017-08-21 clair db...
-    # There are 62 features in the container scan, and 14 have vulnerabilities
+    # Using the specific lolcow image and the 2019-06-24 clair db...
+    # There are 97 features in the container scan, and 23 have vulnerabilities
     assert 'Layer' in output
     assert 'Features' in output['Layer']
-    assert len(output['Layer']['Features']) == 126
+    assert len(output['Layer']['Features']) == 97
     features_with_vuln = 0
     for feature in output['Layer']['Features']:
         if 'Vulnerabilities' in feature:
             features_with_vuln = features_with_vuln + 1
-    assert features_with_vuln == 30
+    assert features_with_vuln == 23
 
 
 @pytest.mark.needs_clair

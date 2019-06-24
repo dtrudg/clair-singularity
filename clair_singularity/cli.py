@@ -31,7 +31,7 @@ def cli(image, clair_uri, text_output, json_output, bind_ip, bind_port, quiet):
         check_image(image)
         (tar_dir, tar_file) = image_to_tgz(image, quiet)
     except ImageError as e:
-        err_and_exit(e.message, 1)
+        err_and_exit(e, 1)
 
     # Image name for Clair will be the SHA256 of the .tar.gz
     image_name = sha256(tar_file)
@@ -42,7 +42,7 @@ def cli(image, clair_uri, text_output, json_output, bind_ip, bind_port, quiet):
     try:
         check_clair(API_URI, quiet)
     except ClairException as e:
-        err_and_exit(e.message)
+        err_and_exit(e)
 
     # Start an HTTP server to serve the .tar.gz from our temporary directory
     # so that Clair can retrieve it
@@ -64,7 +64,7 @@ def cli(image, clair_uri, text_output, json_output, bind_ip, bind_port, quiet):
     except ClairException as e:
         httpd.terminate()
         shutil.rmtree(tar_dir)
-        err_and_exit(e.message, 1)
+        err_and_exit(e, 1)
 
     # Done with the .tar.gz so stop serving it and remove the temp dir
     httpd.terminate()
