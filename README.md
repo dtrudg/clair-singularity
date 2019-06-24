@@ -125,10 +125,7 @@ runs tests in this docker container.
 
 __TravisCI__
 
-Travis CI automated testing will test non-Clair dependent code using Python 2.7, 3.4, 3.5, 3.6.
+Travis CI automated testing will test non-Clair dependent code using Python 2.7, 3.6, 3.7
 
 Clair dependent code will be tested only in the 3.6 environment, by building the docker container, starting a Clair
 service, and running tests in the docker container.
-
-
-
