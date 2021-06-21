@@ -17,7 +17,7 @@ def check_image(image):
     return True
 
 
-def image_to_tgz(image, quiet):
+def image_to_tgz(image, verbose):
     """Export the singularity image to a tar.gz file"""
 
     sandbox_dir = tempfile.mkdtemp()
@@ -26,17 +26,20 @@ def image_to_tgz(image, quiet):
 
     cmd = ['singularity', 'build', '-F', '--sandbox', sandbox_dir, image]
 
-    if not quiet:
+    if verbose:
         sys.stderr.write("Exporting image to sandbox.\n")
 
     try:
-        subprocess.check_call(cmd)
+        output = subprocess.check_output(cmd, stderr=subprocess.STDOUT)
     except (subprocess.CalledProcessError, OSError) as e:
         raise ImageException("Error calling Singularity export to create sandbox\n%s" % e)
 
+    if verbose:
+        sys.stderr.write(output.decode("utf-8"))
+
     cmd = ['tar', '-C', sandbox_dir, '-zcf', tar_gz_file, '.']
 
-    if not quiet:
+    if verbose:
         sys.stderr.write("Compressing to .tar.gz\n")
 
     try:
@@ -52,15 +55,16 @@ class QuietSimpleHTTPHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
         pass
 
 
-def http_server(dir, ip, port, quiet):
+def http_server(dir, ip, port, verbose):
     """Use Python's Simple HTTP server to expose the image over HTTP for
     clair to grab it.
     """
-    sys.stderr.write("Serving Image to Clair from http://%s:%d\n" % (ip, port))
     chdir(dir)
-    if quiet:
-        Handler = QuietSimpleHTTPHandler
-    else:
+    if verbose:
+        sys.stderr.write("Serving Image to Clair from http://%s:%d\n" % (ip, port))
         Handler = SimpleHTTPServer.SimpleHTTPRequestHandler
+    else:
+        Handler = QuietSimpleHTTPHandler
+        
     httpd = socketserver.TCPServer((ip, port), Handler)
     httpd.serve_forever()

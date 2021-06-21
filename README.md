@@ -4,8 +4,8 @@
 <a href="https://travis-ci.org/dctrud/clair-singularity"><img src="https://travis-ci.org/dctrud/clair-singularity.svg?branch=master"></a>
 [![Coverage Status](https://coveralls.io/repos/github/dctrud/clair-singularity/badge.svg?branch=master)](https://coveralls.io/github/dctrud/clair-singularity?branch=master)
 
-__Scan [Singularity](http://singularity.lbl.gov/) container images for security vulnerabilities
-using [CoreOS Clair](https://github.com/coreos/clai).__
+__Scan [SingularityCE](http://sylabs.io/singularity/) container images for security vulnerabilities
+using [CoreOS Clair](https://github.com/coreos/clair).__
 
 The [CoreOS Clair vulnerability scanner](https://github.com/coreos/clair) is a useful tool able to scan docker and other container
 formats for security vulnerabilities. It obtains up-to-date lists of vulerabilities for various
@@ -38,8 +38,8 @@ Clair instance, or that only a trusted Clair instance can retrieve images from t
 
 To use clair-singularity you will need a _Linux_ host with:
 
-  * Python 2.7 or greater installed
-  * Singularity 3+ installed (tested with 3.2.1) and the singularity executable in your `PATH`
+  * Python 3.5 or greater installed
+  * Singularity 3+ installed (tested with 3.8.0) and the singularity executable in your `PATH`
   * A Clair instance running somewhere, that is able to access the machine you will run 
   clair-singularity on. It's easiest to accomplish this using docker to run a local Clair instance as below.
   
@@ -57,11 +57,11 @@ https://github.com/arminc/clair-local-scan
 To startup a Clair instance locally using these instances:
 
 ```bash
-docker run -d --name db arminc/clair-db:2019-06-24
-docker run -p 6060:6060 --link db:postgres -d --name clair arminc/clair-local-scan:v2.0.8_0ed98e9ead65a51ba53f7cc53fa5e80c92169207
+docker run -d --name db arminc/clair-db:2021-06-14
+docker run -p 6060:6060 --link db:postgres -d --name clair arminc/clair-local-scan:v2.1.7_5125fde67edee46cb058a3feee7164af9645e07d
 ```
 
-*Replace the clair-db:2019-06-24 image tag with a later date for newer vulnerabilities*
+*Replace the clair-db:2021-06-14 image tag with a later date for newer vulnerabilities*
 
 
 ## Installation
@@ -85,10 +85,10 @@ IP of your host, so that dockerized clair can access them.
 To scan a singularity image, using a clair instance running under local docker, on
 port 6060:
 
-    clair-singularity --bind-ip 192.168.1.201 myimage.img
+    clair-singularity myimage.img
     
-/Replace `192.168.1.201` with a non-localhost IP of your machine, accessible to
-docker containers./
+/If your hostname is not resolvable to a non-localhost IP of your machine, accessible to
+docker containers, you must specify the IP with `--bind-ip`/
     
 __Clair on a different machine__
 
@@ -122,10 +122,3 @@ Starts a Clair service with local docker, builds clair-singularity into a docker
 runs tests in this docker container.
 
     $ build_scripts/docker_local_tests.sh
-
-__TravisCI__
-
-Travis CI automated testing will test non-Clair dependent code using Python 2.7, 3.6, 3.7
-
-Clair dependent code will be tested only in the 3.6 environment, by building the docker container, starting a Clair
-service, and running tests in the docker container.

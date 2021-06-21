@@ -3,14 +3,14 @@ Scan Singularity container images using CoreOS Clair.
 """
 from setuptools import find_packages, setup
 
-dependencies = ['click', 'six', 'requests']
+dependencies = ['click', 'six', 'requests', 'texttable']
 
 setup(
     name='clair_singularity',
-    version='0.2.0',
+    version='0.3.0',
     url='https://github.com/dctrud/clair-singularity',
     author='David Trudgian',
-    author_email='david.trudgian@utsouthwestern.edu',
+    author_email='dtrudg@sylabs.io',
     description='Scan Singularity container images using CoreOS Clair.',
     long_description=__doc__,
     packages=find_packages(exclude=['tests']),

@@ -4,9 +4,7 @@ language: python
 services:
   - docker
 python:
-  - "2.7"
-  - "3.6"
-  - "3.7"
+  - "3.9"
 before_install:
   - build_scripts/travis_singularity.sh
   - pip install flake8 pytest pytest-cov pytest-flake8 python-coveralls

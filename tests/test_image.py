@@ -15,10 +15,9 @@ def testimage(tmpdir):
     """Fetch a test singularity image"""
     cwd = os.getcwd()
     os.chdir(tmpdir.strpath)
-    # This pulls a singularity lolcow image
-    subprocess.check_output(['singularity', 'pull', '-U', 'library://sylabsed/examples/lolcow:sha256.2c82ea3923489b14b7c6b7cc593f384c44e107a0a0579d9148fa1331d4508736'])
+    subprocess.check_output(['singularity', 'pull', 'library://library/default/ubuntu:sha256.cb37e547a14249943c5a3ee5786502f8db41384deb83fa6d2b62f3c587b82b17'])
     os.chdir(cwd)
-    return os.path.join(tmpdir.strpath, 'lolcow_sha256.2c82ea3923489b14b7c6b7cc593f384c44e107a0a0579d9148fa1331d4508736.sif')
+    return os.path.join(tmpdir.strpath, 'ubuntu_sha256.cb37e547a14249943c5a3ee5786502f8db41384deb83fa6d2b62f3c587b82b17.sif')
 
 
 def test_check_image(testimage):
@@ -36,10 +35,6 @@ def test_image_to_tgz(testimage):
     assert os.path.isdir(temp_dir)
     # The tar.gz should exist
     assert os.path.isfile(tar_file)
-    # With the correct sha256
-    # NO - the tar create in not reproducible (dir/file order?)
-    # assert sha256(tar_file) == '337436d1b561fd4d174a43474baf742c9d436d4a58a343275322517bad044d75'
-
 
 def test_http_server(testimage, tmpdir):
     """Test we can retrieve a test file from in-built http server faithfully"""
@@ -53,7 +48,7 @@ def test_http_server(testimage, tmpdir):
         httpd.terminate()
         err_and_exit("HTTP server did not become ready", 1)
 
-    r = requests.get('http://127.0.0.1:8088/lolcow_sha256.2c82ea3923489b14b7c6b7cc593f384c44e107a0a0579d9148fa1331d4508736.sif', stream=True)
+    r = requests.get('http://127.0.0.1:8088/ubuntu_sha256.cb37e547a14249943c5a3ee5786502f8db41384deb83fa6d2b62f3c587b82b17.sif', stream=True)
 
     tmpfile = os.path.join(tmpdir.strpath, 'downloaded.sif')
     # Check the file is good
