@@ -1,0 +1,20 @@
+version: 2.1
+
+workflows:
+  default:
+    jobs:
+      - build-and-test
+
+jobs:
+  build-and-test: 
+    machine:
+      image: ubuntu-2004:202104-01
+    steps:
+      - checkout
+      - run:
+          name: install
+          command: python3 setup.py install
+      - run:
+          name: test
+          command: build_scripts/docker_local_tests.sh
+
