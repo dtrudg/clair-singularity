@@ -1,4 +1,4 @@
-FROM quay.io/singularity/singularity:3.7.4
+FROM quay.io/singularity/singularity:v3.7.4
 
 # Testing package
 RUN apk add --update python3 python3-dev py3-pip build-base

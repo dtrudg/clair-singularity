@@ -95,10 +95,14 @@ def format_report_text(report):
 
     print("Found %d vulnerabilities in %d features/packages:\n" % (len(vulns), vulnFeatures))
 
-    size = os.get_terminal_size()
+    width = 80
+    try:
+        width = os.get_terminal_size().columns
+    except OSError:
+        pass
 
     table = Texttable() 
-    table.set_max_width(size.columns)
+    table.set_max_width(width)
     table.set_cols_align(["l", "l", "c", "l", "l"])
     table.add_rows(vulns)
     print(table.draw())

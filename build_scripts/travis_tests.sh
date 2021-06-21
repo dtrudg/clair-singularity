@@ -11,11 +11,11 @@ pytest tests/ -v -m "not needs_clair" --cov clair_singularity --cov-report term-
 
 if [[ $TRAVIS_PYTHON_VERSION == "3.6"* ]]; then
     echo "Python 3.6 - running docker tests with Clair"
-    docker pull arminc/clair-db:2019-06-24
-    docker run -d --name clair-db arminc/clair-db:2019-06-24
+    docker pull arminc/clair-db:2021-06-14
+    docker run -d --name clair-db arminc/clair-db:2021-06-14
     sleep 5
-    docker pull arminc/clair-local-scan:v2.0.8_0ed98e9ead65a51ba53f7cc53fa5e80c92169207
-    docker run -p 6060:6060 --link clair-db:postgres -d --name clair arminc/clair-local-scan:v2.0.8_0ed98e9ead65a51ba53f7cc53fa5e80c92169207
+    docker pull arminc/clair-local-scan:v2.1.7_5125fde67edee46cb058a3feee7164af9645e07d
+    docker run -p 6060:6060 --link clair-db:postgres -d --name clair arminc/clair-local-scan:v2.1.7_5125fde67edee46cb058a3feee7164af9645e07d
     docker ps
     docker build -t clair-singularity .
 
