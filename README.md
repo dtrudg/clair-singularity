@@ -1,13 +1,12 @@
 # clair-singularity
 
 [![CircleCI](https://circleci.com/gh/dtrudg/clair-singularity/tree/master.svg?style=svg)](https://circleci.com/gh/dtrudg/clair-singularity/tree/master)
-[![Coverage Status](https://coveralls.io/repos/github/dtrudg/clair-singularity/badge.svg?branch=master)](https://coveralls.io/github/dtrudg/clair-singularity?branch=master)
 
 __Scan [SingularityCE](http://sylabs.io/singularity/) container images for security vulnerabilities
 using [CoreOS Clair](https://github.com/coreos/clair).__
 
 The [CoreOS Clair vulnerability scanner](https://github.com/coreos/clair) is a useful tool able to scan docker and other container
-formats for security vulnerabilities. It obtains up-to-date lists of vulerabilities for various
+formats for security vulnerabilities. It obtains up-to-date lists of vulnerabilities for various
 platforms (namespaces) from public databases.
 
 We can use Clair to scan singularity containers, by exploiting the fact that an exported .tar.gz of a
