@@ -73,6 +73,11 @@ def format_report_text(report):
     """Format the json into a very simple plain text report of vulnerabilities
     per feature"""
 
+    if 'Features' not in report['Layer'].keys():
+        print("No features were found in the image - report cannot be generated.\n")
+        return
+
+
     features = report['Layer']['Features']
     headers = ["Feature", "Version", "Severity", "Identifier", "Description"]
     vulns = [headers]

@@ -24,7 +24,7 @@ def image_to_tgz(image, verbose):
     tar_dir  = tempfile.mkdtemp()
     tar_gz_file = path.join(tar_dir, path.basename(image) + '.tar.gz')
 
-    cmd = ['singularity', 'build', '-F', '--sandbox', sandbox_dir, image]
+    cmd = ['singularity', 'build', '-F', '--fix-perms', '--sandbox', sandbox_dir, image]
 
     if verbose:
         sys.stderr.write("Exporting image to sandbox.\n")
@@ -37,7 +37,7 @@ def image_to_tgz(image, verbose):
     if verbose:
         sys.stderr.write(output.decode("utf-8"))
 
-    cmd = ['tar', '-C', sandbox_dir, '-zcf', tar_gz_file, '.']
+    cmd = ['tar', '--ignore-failed-read', '-C', sandbox_dir, '-zcf', tar_gz_file, '.']
 
     if verbose:
         sys.stderr.write("Compressing to .tar.gz\n")
