@@ -2,8 +2,10 @@
 
 [![CircleCI](https://circleci.com/gh/dtrudg/clair-singularity/tree/master.svg?style=svg)](https://circleci.com/gh/dtrudg/clair-singularity/tree/master)
 
-__Scan [SingularityCE](http://sylabs.io/singularity/) container images for security vulnerabilities
+__Scan [Singularity](http://sylabs.io/singularity/) container images for security vulnerabilities
 using [CoreOS Clair](https://github.com/coreos/clair).__
+
+![screenshot](screenshot.png)
 
 The [CoreOS Clair vulnerability scanner](https://github.com/coreos/clair) is a useful tool able to scan docker and other container
 formats for security vulnerabilities. It obtains up-to-date lists of vulnerabilities for various
@@ -25,7 +27,7 @@ Based on experiments detailed [in this Gist](https://gist.github.com/dctrud/4797
 
 __IMPORTANT NOTES__
 
-CI tests usage with SingularityCE 3.9.7
+Funtionality was last tested using SingularityCE 3.9.7.
 
 This tool should be considered proof of concept, not heavily tested. Use at your own risk. 
 
@@ -39,7 +41,7 @@ Clair instance, or that only a trusted Clair instance can retrieve images from t
 To use clair-singularity you will need a _Linux_ host with:
 
   * Python 3.5 or greater installed
-  * Singularity 3+ installed (tested with 3.8.0) and the singularity executable in your `PATH`
+  * SingularityCE 3+ installed (tested with 3.9.7) and the singularity executable in your `PATH`
   * A Clair instance running somewhere, that is able to access the machine you will run 
   clair-singularity on. It's easiest to accomplish this using docker to run a local Clair instance as below.
   
@@ -77,15 +79,10 @@ python setup.py install
 
 __Clair on same machine__
 
-
-If you are running `clair-singularity` locally (outside of docker), and clair
-within docker, you need to tell `clair-singularity` to serve images on the main
-IP of your host, so that dockerized clair can access them.
-
 To scan a singularity image, using a clair instance running under local docker, on
 port 6060:
 
-    clair-singularity myimage.img
+    clair-singularity myimage.sif
     
 /If your hostname is not resolvable to a non-localhost IP of your machine, accessible to
 docker containers, you must specify the IP with `--bind-ip`/
@@ -105,20 +102,3 @@ By default, clair-singularity gives a simplified text report on STDOUT. To obtai
 report returned by Clair use the `--jsoon-output` option.
 
     clair-singularity --json-output myimage.img
-
-## Development / Testing
-
-Tests can are run in 3 different ways:
-
-__Local - no access to Clair__
-
-Runs all tests that don't depend on access to a Clair server, using the local Python.
-
-    $ build_scripts/noclair_local_tests.sh
-
-__Local - dockerized with Clair__
-
-Starts a Clair service with local docker, builds clair-singularity into a docker container, with Python 3.5, and
-runs tests in this docker container.
-
-    $ build_scripts/docker_local_tests.sh

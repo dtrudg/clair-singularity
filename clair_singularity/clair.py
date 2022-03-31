@@ -97,7 +97,7 @@ def format_report_text(report):
                     vuln['Link'] + "\n" + vuln['Description']
                 ])
 
-    print("Image contains %d features/packages total.\n", len(features))
+    print("Image contains %d features/packages total.\n" % len(features))
     print("Found %d vulnerabilities in %d features/packages:\n" % (len(vulns)-1, vulnFeatures))
 
     if vulnFeatures > 0:

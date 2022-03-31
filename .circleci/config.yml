@@ -8,13 +8,31 @@ workflows:
 jobs:
   build-and-test: 
     machine:
-      image: ubuntu-2004:202104-01
+      image: ubuntu-2004:current
     steps:
       - checkout
+      - run: 
+          name: install deps
+          command: |
+            sudo apt-get update
+            sudo apt-get -y install cryptsetup-bin squashfs-tools
+      - run: 
+          name: install singularity
+          command: |
+            wget https://github.com/sylabs/singularity/releases/download/v3.9.7/singularity-ce_3.9.7-focal_amd64.deb
+            sudo apt -y install ./singularity-ce_3.9.7-focal_amd64.deb
+            rm singularity-ce_3.9.7-focal_amd64.deb
       - run:
           name: install
-          command: python3 setup.py install
+          command: python3 setup.py install --user
+      - run:
+          name: start clair
+          command: |
+            docker pull arminc/clair-db:2021-06-14
+            docker run -d --name clair-db arminc/clair-db:2021-06-14
+            sleep 5
+            docker pull arminc/clair-local-scan:v2.1.7_5125fde67edee46cb058a3feee7164af9645e07d
+            docker run -p 6060:6060 --link clair-db:postgres -d --name clair arminc/clair-local-scan:v2.1.7_5125fde67edee46cb058a3feee7164af9645e07d
       - run:
           name: test
-          command: build_scripts/docker_local_tests.sh
-
+          command: python3 setup.py test

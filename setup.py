@@ -7,7 +7,7 @@ dependencies = ['click', 'six', 'requests', 'texttable']
 
 setup(
     name='clair_singularity',
-    version='0.3.0',
+    version='0.4.0',
     url='https://github.com/dctrud/clair-singularity',
     author='David Trudgian',
     author_email='dtrudg@sylabs.io',

@@ -24,7 +24,7 @@ def test_help(runner):
 def test_full_json(runner, testimage):
     result = runner.invoke(cli,
                            ['--json-output', '--bind-ip', MY_IP, '--bind-port', '8081', '--clair-uri',
-                            'http://clair:6060', testimage])
+                            'http://localhost:6060', testimage])
     output = json.loads(result.output)
 
     # There are 62 features in the container scan, and 18 have vulnerabilities
@@ -41,7 +41,7 @@ def test_full_json(runner, testimage):
 @pytest.mark.needs_clair
 def test_full_text(runner, testimage):
     result = runner.invoke(cli, ['--bind-ip', MY_IP, '--bind-port', '8082', '--clair-uri',
-                                 'http://clair:6060', testimage])
+                                 'http://localhost:6060', testimage])
     # Check we do have some CVEs we expect reported here
     assert 'coreutils' in result.output
     assert 'CVE' in result.output
