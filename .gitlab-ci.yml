@@ -1,8 +1,0 @@
-before_script:
-  - python setup.py develop --user
-  - module add singularity
-
-test:
-  script:
-  - build_scripts/noclair_local_tests.sh
-
