@@ -25,6 +25,8 @@ Based on experiments detailed [in this Gist](https://gist.github.com/dctrud/4797
 
 __IMPORTANT NOTES__
 
+CI tests usage with SingularityCE 3.9.7
+
 This tool should be considered proof of concept, not heavily tested. Use at your own risk. 
 
 There is no support yet for SSL client certificates to verify that we are sending API requests to a trusted
@@ -55,11 +57,11 @@ https://github.com/arminc/clair-local-scan
 To startup a Clair instance locally using these instances:
 
 ```bash
-docker run -d --name db arminc/clair-db:2021-06-14
-docker run -p 6060:6060 --link db:postgres -d --name clair arminc/clair-local-scan:v2.1.7_5125fde67edee46cb058a3feee7164af9645e07d
+docker run -d --name db arminc/clair-db:2022-03-31
+docker run -p 6060:6060 --link db:postgres -d --name clair arminc/clair-local-scan:v2.1.8_9bca9a9a7bce2fd2e84efcc98ab00c040177e258
 ```
 
-*Replace the clair-db:2021-06-14 image tag with a later date for newer vulnerabilities*
+*Replace the clair-db:2022-03-31 image tag with a later date for newer vulnerabilities*
 
 
 ## Installation

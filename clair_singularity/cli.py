@@ -7,7 +7,7 @@ from multiprocessing import Process
 
 from . import VERSION
 from .clair import check_clair, post_layer, get_report, format_report_text, ClairException
-from .util import sha256, wait_net_service, err_and_exit, pretty_json
+from .util import sha256, wait_net_service, err_and_exit, pretty_json, find_free_port
 from .image import check_image, image_to_tgz, http_server, ImageException
 
 
@@ -18,7 +18,7 @@ from .image import check_image, image_to_tgz, http_server, ImageException
 @click.option('--json-output', is_flag=True, help='Report in JSON')
 @click.option('--bind-ip', default="",
               help='IP address that the HTTP server providing image to Clair should listen on')
-@click.option('--bind-port', default=8088,
+@click.option('--bind-port', default=0,
               help='Port that the HTTP server providing image to Clair should listen on')
 @click.option('--verbose', is_flag=True, help='Show progress messages to STDERR')
 @click.version_option(version=VERSION)
@@ -53,6 +53,8 @@ def cli(image, clair_uri, text_output, json_output, bind_ip, bind_port, verbose)
 
     # Start an HTTP server to serve the .tar.gz from our temporary directory
     # so that Clair can retrieve it
+    if bind_port == 0:
+        bind_port = find_free_port()
     httpd = Process(target=http_server, args=(tar_dir, bind_ip, bind_port, verbose))
     httpd.daemon = True
     httpd.start()

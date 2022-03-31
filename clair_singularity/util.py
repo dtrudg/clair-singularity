@@ -1,6 +1,8 @@
 import hashlib
 import json
 import sys
+import socket
+from contextlib import closing
 
 
 def sha256(fname):
@@ -22,6 +24,11 @@ def err_and_exit(e, code=1):
     sys.stderr.write(str(e))
     sys.exit(code)
 
+def find_free_port():
+    with closing(socket.socket(socket.AF_INET, socket.SOCK_STREAM)) as s:
+        s.bind(('', 0))
+        s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        return s.getsockname()[1]
 
 # http://code.activestate.com/recipes/576655-wait-for-network-service-to-appear/
 #

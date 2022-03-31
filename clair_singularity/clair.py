@@ -58,7 +58,7 @@ def get_report(API_URI, image_name):
     """Retrieve and return the features & vulnerabilities report from Clair"""
 
     try:
-        r = requests.get(API_URI + 'layers/' + image_name, params={'vulnerabilities': 'true'})
+        r = requests.get(API_URI + 'layers/' + image_name, params={'features': 'true', 'vulnerabilities': 'true'})
 
         if r.status_code == requests.codes.ok:
             return r.json()
@@ -97,18 +97,19 @@ def format_report_text(report):
                     vuln['Link'] + "\n" + vuln['Description']
                 ])
 
-
+    print("Image contains %d features/packages total.\n", len(features))
     print("Found %d vulnerabilities in %d features/packages:\n" % (len(vulns)-1, vulnFeatures))
 
-    width = 80
-    try:
-        width = os.get_terminal_size().columns
-    except OSError:
-        pass
+    if vulnFeatures > 0:
+        width = 80
+        try:
+            width = os.get_terminal_size().columns
+        except OSError:
+            pass
 
-    table = Texttable() 
-    table.set_max_width(width)
-    table.set_cols_align(["l", "l", "c", "l", "l"])
-    table.add_rows(vulns)
-    print(table.draw())
+        table = Texttable() 
+        table.set_max_width(width)
+        table.set_cols_align(["l", "l", "c", "l", "l"])
+        table.add_rows(vulns)
+        print(table.draw())
     
