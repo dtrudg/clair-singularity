@@ -98,7 +98,7 @@ def format_report_text(report):
                 ])
 
 
-    print("Found %d vulnerabilities in %d features/packages:\n" % (len(vulns), vulnFeatures))
+    print("Found %d vulnerabilities in %d features/packages:\n" % (len(vulns)-1, vulnFeatures))
 
     width = 80
     try:
